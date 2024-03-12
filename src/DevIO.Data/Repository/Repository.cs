@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System;
+using System.Linq.Expressions;
 using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
 using DevIO.Data.Context;
@@ -46,8 +47,42 @@ namespace DevIO.Data.Repository
 
         public virtual async Task Remover(Guid id)
         {
-            DbSet.Remove(new TEntity { Id = id });
-            await SaveChanges();
+            try
+            {
+                DbSet.Remove(new TEntity { Id = id });
+                await SaveChanges();
+            }
+            catch(DbUpdateConcurrencyException ex)
+            {
+                // The code from Microsoft - Resolving concurrency conflicts
+                foreach (var entry in ex.Entries)
+                {
+                    if (entry.Entity is Produto)
+                    {
+                        var proposedValues = entry.CurrentValues; //Your proposed changes
+                        var databaseValues = entry.GetDatabaseValues(); //Values in the Db
+
+                        foreach (var property in proposedValues.Properties)
+                        {
+                            var proposedValue = proposedValues[property];
+                            var databaseValue = databaseValues[property];
+
+                            // TODO: decide which value should be written to database
+                            // proposedValues[property] = <value to be saved>;
+                        }
+
+                        // Refresh original values to bypass next concurrency check
+                        entry.OriginalValues.SetValues(databaseValues);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException(
+                            "Don't know how to handle concurrency conflicts for "
+                            + entry.Metadata.Name);
+                    }
+                }
+            }
+            
         }
 
         public async Task<int> SaveChanges()

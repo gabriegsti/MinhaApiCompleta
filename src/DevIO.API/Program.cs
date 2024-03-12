@@ -35,10 +35,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 
 builder.Services.ResolveDependencies();
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 //Allow cors for development
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("development",
+    options.AddPolicy(name: MyAllowSpecificOrigins,
         builder =>
         {
             builder
@@ -50,8 +52,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-//Sets Development option for cors
-app.UseCors("development");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -62,6 +62,9 @@ if (app.Environment.IsDevelopment())
 
 
 app.UseHttpsRedirection();
+
+//Sets Development option for cors
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthorization();
 
