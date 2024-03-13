@@ -13,6 +13,7 @@ namespace DevIO.API.Configuration
             CreateMap<ProdutoViewModel, Produto>();
             CreateMap<Produto, ProdutoViewModel>()
                 .ForMember(dest => dest.NomeFornecedor, opt => opt.MapFrom(src => src.Fornecedor.Nome));
+            CreateMap<ProdutoImagemViewModel, Produto>().ReverseMap();
         }
     }
 }
