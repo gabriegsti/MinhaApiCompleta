@@ -1,13 +1,18 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
+using DevIO.API.Controllers;
+using DevIO.API.Extensions;
 using DevIO.API.ViewModels;
 using DevIO.Business.Intefaces;
 using DevIO.Business.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DevIO.API.Controllers
+namespace DevIO.API.V1.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiVersion("1.0")]
+    [Authorize]
+    [Route("api/v{version:apiVersion}/[controller]")]
     public class FornecedoresController : MainController
     {
         private readonly IFornecedorRepository _fornecedorRepository;
@@ -20,7 +25,8 @@ namespace DevIO.API.Controllers
             IMapper mapper,
             IFornecedorService fornecedorService,
             INotificador notificador,
-            IEnderecoRepository enderecoRepository) : base(notificador)
+            IEnderecoRepository enderecoRepository,
+            IUser user) : base(notificador, user)
         {
             _fornecedorRepository = fornecedorRepository;
             _mapper = mapper;
@@ -28,8 +34,10 @@ namespace DevIO.API.Controllers
             _enderecoRepository = enderecoRepository;
         }
 
+        //[AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<FornecedorViewModel>>> ObterTodos()
+
         {
             var fornecedor = _mapper
                 .Map<IEnumerable<FornecedorViewModel>>(await _fornecedorRepository.ObterTodos());
@@ -41,8 +49,8 @@ namespace DevIO.API.Controllers
         public async Task<ActionResult<FornecedorViewModel>> ObterPorId(Guid id)
         {
             var fornecedor = await ObterFornecedorProdutosEndereco(id);
-         
-            if(fornecedor == null)
+
+            if (fornecedor == null)
             {
                 return NotFound();
             }
@@ -56,16 +64,17 @@ namespace DevIO.API.Controllers
             return _mapper.Map<EnderecoViewModel>(await _enderecoRepository.ObterPorId(id));
         }
 
+        [ClaimsAuthorize("Fornecedor", "Atualizar")]
         [HttpGet("atualizar-endereco/{id:guid}")]
         public async Task<IActionResult> AtualizarEndereco(Guid id, EnderecoViewModel enderecoViewModel)
         {
-            if(id != enderecoViewModel.Id)
+            if (id != enderecoViewModel.Id)
             {
                 NotificarErro("O id informado não é o mesmo que foi passado na query");
                 return CustomResponse(enderecoViewModel);
             }
 
-            if(!ModelState.IsValid) return CustomResponse(ModelState);
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
 
             var endereco = _mapper.Map<Endereco>(enderecoViewModel);
             await _fornecedorService.AtualizarEndereco(endereco);
@@ -73,10 +82,22 @@ namespace DevIO.API.Controllers
             return CustomResponse(ModelState);
         }
 
+
+        [ClaimsAuthorize("Fornecedor", "Adicionar")]
         [HttpPost]
         public async Task<ActionResult<FornecedorViewModel>> Adicionar(FornecedorViewModel fornecedorViewModel)
         {
-            if(!ModelState.IsValid)
+            if (User.Identity.IsAuthenticated)
+            {
+                var userName = User.Identity.Name;
+            }
+
+            if (UsuarioAutenticado)
+            {
+                var userName = UsuarioId;
+            }
+
+            if (!ModelState.IsValid)
             {
                 return CustomResponse(ModelState);
             }
@@ -87,6 +108,7 @@ namespace DevIO.API.Controllers
             return CustomResponse(fornecedorViewModel);
         }
 
+        [ClaimsAuthorize("Fornecedor", "Atualizar")]
         [HttpPut("{id:guid}")]
         public async Task<ActionResult<FornecedorViewModel>> Atualizar(Guid id, FornecedorViewModel fornecedorViewModel)
         {
@@ -96,7 +118,7 @@ namespace DevIO.API.Controllers
                 return CustomResponse(fornecedorViewModel);
             }
 
-            if(!ModelState.IsValid) return CustomResponse(ModelState);
+            if (!ModelState.IsValid) return CustomResponse(ModelState);
 
             var fornecedor = _mapper.Map<Fornecedor>(fornecedorViewModel);
             var result = await _fornecedorService.Atualizar(fornecedor);
@@ -104,14 +126,14 @@ namespace DevIO.API.Controllers
             return CustomResponse(fornecedorViewModel);
         }
 
-
+        [ClaimsAuthorize("Fornecedor", "Excluir")]
         [HttpDelete("{id:guid}")]
         public async Task<ActionResult<FornecedorViewModel>> Excluir(Guid id)
         {
             var fornecedorViewModel = await ObterFornecedorEndereco(id);
 
-            if(fornecedorViewModel == null) 
-            { 
+            if (fornecedorViewModel == null)
+            {
                 return NotFound();
             }
 
@@ -119,8 +141,8 @@ namespace DevIO.API.Controllers
 
             return CustomResponse(fornecedorViewModel);
         }
-        
-        
+
+
         private async Task<FornecedorViewModel> ObterFornecedorProdutosEndereco(Guid id)
         {
             return _mapper
