@@ -46,8 +46,10 @@ namespace DevIO.API.Configuration
 
         public static IApplicationBuilder UseSwaggerConfig(this IApplicationBuilder app, IApiVersionDescriptionProvider provider)
         {
-            //app.UseMiddleware<SwaggerAuthorizedMiddleware>();
+            app.UseMiddleware<SwaggerAuthorizedMiddleware>();
+
             app.UseSwagger();
+
             app.UseSwaggerUI(
                 options =>
                 {
@@ -56,6 +58,8 @@ namespace DevIO.API.Configuration
                         options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
                     }
                 });
+
+            
             return app;
         }
     }

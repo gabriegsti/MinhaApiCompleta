@@ -1,15 +1,10 @@
 using Asp.Versioning.ApiExplorer;
 using AutoMapper;
 using DevIO.API.Configuration;
-using DevIO.API.Data;
+using DevIO.API.Extensions;
 using DevIO.Data.Context;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using HealthChecks.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +25,16 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.WebApiConfig();
 
 builder.Services.AddSwaggerConfig();
+
+builder.Services.AddLoggingConfiguration();
+
+builder.Services.AddHealthChecks()
+    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), name: "BancoSql");
+
+
+builder.Services.AddHealthChecksUI()
+    .AddSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+
 
 builder.Services.ResolveDependencies();
 
@@ -53,9 +58,20 @@ app.UseAuthentication();
 
 app.UseHsts();
 
+app.UseMiddleware<ExceptionMiddleware>();   
+
 app.UseMvcConfiguration();
 
 app.UseSwaggerConfig(apiVersionDescriptionProvider);
+
+app.UseLoggingConfiguration();
+
+app.UseHealthChecks("/api/health");
+
+app.UseHealthChecksUI(options => 
+{
+  options.UIPath = "/api/hc-ui";
+});
 
 app.MapControllers();
 app.Run();
