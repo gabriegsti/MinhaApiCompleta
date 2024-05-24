@@ -15,8 +15,6 @@ namespace DevIO.API.Configuration
                 options.SuppressModelStateInvalidFilter = true;
             });
 
-
-            
             services
             .AddApiVersioning(options =>
             {
@@ -59,7 +57,7 @@ namespace DevIO.API.Configuration
                         builder
                         //Always able to write more methods
                         .WithMethods("GET","POST")
-                        //Always able to qrite more domains
+                        //Always able to write more domains
                         .WithOrigins("http://desenvolvedor.io")
                         .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyHeader();

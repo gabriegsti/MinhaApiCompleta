@@ -4,7 +4,10 @@ using DevIO.API.Configuration;
 using DevIO.API.Extensions;
 using DevIO.Data.Context;
 using HealthChecks.SqlServer;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using SqlServerHealthCheck = DevIO.API.Extensions.SqlServerHealthCheck;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,14 +29,7 @@ builder.Services.WebApiConfig();
 
 builder.Services.AddSwaggerConfig();
 
-builder.Services.AddLoggingConfiguration();
-
-builder.Services.AddHealthChecks()
-    .AddSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), name: "BancoSql");
-
-
-builder.Services.AddHealthChecksUI()
-    .AddSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.AddLoggingConfiguration(builder.Configuration);
 
 
 builder.Services.ResolveDependencies();
@@ -66,12 +62,6 @@ app.UseSwaggerConfig(apiVersionDescriptionProvider);
 
 app.UseLoggingConfiguration();
 
-app.UseHealthChecks("/api/health");
-
-app.UseHealthChecksUI(options => 
-{
-  options.UIPath = "/api/hc-ui";
-});
 
 app.MapControllers();
 app.Run();
