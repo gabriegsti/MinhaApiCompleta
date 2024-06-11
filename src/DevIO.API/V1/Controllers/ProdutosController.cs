@@ -71,7 +71,7 @@ namespace DevIO.API.V1.Controllers
         [ClaimsAuthorize("Produto", "Adicionar")]
         [RequestSizeLimit(8388608)]
         [HttpPost("imagem")]
-        public async Task<ActionResult> AdicionarImagem(IFormFile file)
+        public ActionResult AdicionarImagem(IFormFile file)
         {
             return Ok(file);
         }

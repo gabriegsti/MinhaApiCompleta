@@ -1,11 +1,10 @@
-﻿using DevIO.API.Data;
+﻿using System.Text;
+using DevIO.API.Data;
 using DevIO.API.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace DevIO.API.Configuration
 {
@@ -17,10 +16,9 @@ namespace DevIO.API.Configuration
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddDefaultIdentity<IdentityUser>()
                     .AddRoles<IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>()
-                    .AddErrorDescriber<IdentityMessagesPortugues>()
                     .AddDefaultTokenProviders();
 
             //JWT configuration

@@ -15,7 +15,7 @@ namespace DevIO.API.Configuration
             //    o.ApiKey = "b2ee58b072fb49cea3b872343e3ac532";
             //    o.LogId = new Guid("f2d47edf-ca7a-4aa2-9d3d-b85a5558c828");
             //});
-
+            services.AddLogging();
             //services.AddLogging(builder =>
             //{
             //    builder.AddElmahIo(o =>
@@ -40,8 +40,6 @@ namespace DevIO.API.Configuration
 
             services.AddHealthChecksUI()
                 .AddSqlServerStorage(configuration.GetConnectionString("DefaultConnection"));
-
-
 
             return services;
         }

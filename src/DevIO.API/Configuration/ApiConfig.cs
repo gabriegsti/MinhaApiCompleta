@@ -8,7 +8,10 @@ namespace DevIO.API.Configuration
     {
         public static IServiceCollection WebApiConfig(this IServiceCollection services)
         {
-            //Desable formatting and validation and automatic errors
+            // Add services to the container.
+            services.AddControllers();
+
+            //Disable formatting and validation and automatic errors
             // More control, in change of verify the modelState in all methods of the controller. 
             services.Configure<ApiBehaviorOptions>(options =>
             {
@@ -37,7 +40,7 @@ namespace DevIO.API.Configuration
                     builder =>
                     {
                         builder
-                        .WithOrigins("http://localhost:4200")
+                        .AllowAnyOrigin()
                         .AllowAnyMethod()
                         .AllowAnyHeader();
                     });
@@ -75,7 +78,7 @@ namespace DevIO.API.Configuration
             app.UseHttpsRedirection();
 
            
-            app.UseAuthorization();
+           
 
 
             return app;

@@ -11,8 +11,13 @@ using SqlServerHealthCheck = DevIO.API.Extensions.SqlServerHealthCheck;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+builder.Configuration
+    .SetBasePath(builder.Environment.ContentRootPath)
+    .AddJsonFile("appsettings.json", true, true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+    .AddEnvironmentVariables();
+
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -25,6 +30,7 @@ builder.Services.AddDbContext<MeuDbContext>(options =>
 builder.Services.AddIdentityConfiguration(builder.Configuration);
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.WebApiConfig();
 
 builder.Services.AddSwaggerConfig();
@@ -50,18 +56,18 @@ else
 }
 var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
-app.UseAuthentication();
+//Copiar versão da minhaapi dotnet6 do curso dev.io
+//Ponto fundamental, é entender porque a app quebrou. 
+
 
 app.UseHsts();
-
-app.UseMiddleware<ExceptionMiddleware>();   
-
 app.UseMvcConfiguration();
-
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseSwaggerConfig(apiVersionDescriptionProvider);
 
 app.UseLoggingConfiguration();
 
-
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();
 app.Run();

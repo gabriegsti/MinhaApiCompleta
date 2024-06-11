@@ -25,7 +25,7 @@ namespace DevIO.API.Extensions
 
         private static void HandleException(HttpContext context, Exception exception)
         {
-            exception.Ship(context);
+            //exception.Ship(context);
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
             //return Task.CompletedTask;
