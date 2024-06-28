@@ -62,11 +62,12 @@ var apiVersionDescriptionProvider = app.Services.GetRequiredService<IApiVersionD
 
 app.UseHsts();
 app.UseMvcConfiguration();
+app.UseLoggingConfiguration();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwaggerConfig(apiVersionDescriptionProvider);
 
-app.UseLoggingConfiguration();
+
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();

@@ -78,7 +78,6 @@ namespace DevIO.API.Configuration
             app.UseHttpsRedirection();
 
            
-           
 
 
             return app;
