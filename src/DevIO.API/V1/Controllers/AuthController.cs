@@ -1,5 +1,4 @@
-﻿using Asp.Versioning;
-using DevIO.API.Controllers;
+﻿using DevIO.API.Controllers;
 using DevIO.API.Extensions;
 using DevIO.API.ViewModels;
 using DevIO.Business.Intefaces;

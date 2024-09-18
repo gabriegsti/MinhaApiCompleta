@@ -1,8 +1,5 @@
-﻿using Asp.Versioning;
-using DevIO.API.Controllers;
+﻿using DevIO.API.Controllers;
 using DevIO.Business.Intefaces;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevIO.API.V1.Controllers

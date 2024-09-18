@@ -1,15 +1,30 @@
-﻿using Asp.Versioning;
+﻿using DevIO.API.Extensions;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 
 namespace DevIO.API.Configuration
 {
     public static class ApiConfig
     {
-        public static IServiceCollection WebApiConfig(this IServiceCollection services)
+        public static IServiceCollection AddApiConfig(this IServiceCollection services)
         {
-            // Add services to the container.
+            // Add all controllers
             services.AddControllers();
+
+            services
+            .AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.ReportApiVersions = true;
+            });
+
+            services.AddVersionedApiExplorer(options =>
+            {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            });
 
             //Disable formatting and validation and automatic errors
             // More control, in change of verify the modelState in all methods of the controller. 
@@ -18,21 +33,6 @@ namespace DevIO.API.Configuration
                 options.SuppressModelStateInvalidFilter = true;
             });
 
-            services
-            .AddApiVersioning(options =>
-            {
-                options.AssumeDefaultVersionWhenUnspecified = true;
-                options.DefaultApiVersion = new ApiVersion(1, 0);
-                options.ReportApiVersions = true;
-            })
-            .AddApiExplorer(options =>
-            {
-                options.GroupNameFormat = "'v'VVV";
-                options.SubstituteApiVersionInUrl = true;
-            })
-            //Always needed if it is not minimal api.
-            .AddMvc();
-
             //Allow cors for development
             services.AddCors(options =>
             {
@@ -40,18 +40,19 @@ namespace DevIO.API.Configuration
                     builder =>
                     {
                         builder
-                        .AllowAnyOrigin()
                         .AllowAnyMethod()
-                        .AllowAnyHeader();
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .SetIsOriginAllowed(hostName => true);
                     });
 
-                options.AddDefaultPolicy(
-                    builder =>                   
-                        builder
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()
-                        .AllowCredentials()
-                        .SetIsOriginAllowed(hostName => true));
+                //options.AddDefaultPolicy(
+                //    builder =>                   
+                //        builder
+                //        .AllowAnyMethod()
+                //        .AllowAnyHeader()
+                //        .AllowCredentials()
+                //        .SetIsOriginAllowed(hostName => true));
 
                 options.AddPolicy("Production",
                     builder =>
@@ -64,22 +65,63 @@ namespace DevIO.API.Configuration
                         .WithOrigins("http://desenvolvedor.io")
                         .SetIsOriginAllowedToAllowWildcardSubdomains()
                         .AllowAnyHeader();
-
                     });
             });
-
-         
 
             return services;
         }
 
-        public static IApplicationBuilder UseMvcConfiguration(this IApplicationBuilder app)
+        public static IApplicationBuilder UseApiConfig(this IApplicationBuilder app, IWebHostEnvironment env)
         {
+
+            // Configure the HTTP request pipeline.
+            if (env.IsDevelopment())
+            {
+                //Sets Development option for cors
+                app.UseCors("Development");
+                app.UseDeveloperExceptionPage();
+
+                app.UseHsts();
+            }
+            else
+            {
+                //Sets Production option for cors
+                app.UseCors("Production");
+                app.UseHsts();
+            }
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
             app.UseHttpsRedirection();
 
-           
+            app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
+            app.UseStaticFiles();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                //Gera o endpoint que retornara os dados que serao utilizados no dashboard
+                endpoints.MapHealthChecks("/api/hc", new HealthCheckOptions()
+                {
+                    Predicate = _ => true,
+                    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+                });
+                
+                endpoints.MapHealthChecksUI(options =>
+                {
+                    //Where UI api will be server by the browser
+                    options.UIPath = "/api/hc-ui";
+                    options.ResourcesPath = "/api/hc-ui-resources";
+
+                    options.UseRelativeApiPath = false;
+                    options.UseRelativeResourcesPath = false;
+                    options.UseRelativeWebhookPath = false;
+                });
+            });
             return app;
         }
 

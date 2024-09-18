@@ -1,4 +1,3 @@
-using Asp.Versioning;
 using AutoMapper;
 using DevIO.API.Controllers;
 using DevIO.API.Extensions;

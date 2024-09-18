@@ -22,7 +22,8 @@ namespace DevIO.API.Extensions
                     var command = connection.CreateCommand();
                     command.CommandText = "Select count(id) from produtos";
 
-                    return Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0 ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy(); 
+                    var result = Convert.ToInt32(await command.ExecuteScalarAsync(cancellationToken)) > 0 ? HealthCheckResult.Healthy() : HealthCheckResult.Unhealthy();
+                    return result;
                 }
             }
             catch (Exception)

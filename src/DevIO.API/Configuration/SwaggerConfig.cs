@@ -1,5 +1,4 @@
-﻿using Asp.Versioning.ApiExplorer;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -46,7 +45,7 @@ namespace DevIO.API.Configuration
 
         public static IApplicationBuilder UseSwaggerConfig(this IApplicationBuilder app, IApiVersionDescriptionProvider provider)
         {
-            //app.UseMiddleware<SwaggerAuthorizedMiddleware>();
+            app.UseMiddleware<SwaggerAuthorizedMiddleware>();
 
             app.UseSwagger();
 

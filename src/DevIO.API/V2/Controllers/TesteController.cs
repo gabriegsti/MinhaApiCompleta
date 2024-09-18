@@ -1,7 +1,5 @@
-﻿using Asp.Versioning;
-using DevIO.API.Controllers;
+﻿using DevIO.API.Controllers;
 using DevIO.Business.Intefaces;
-using Elmah.Io.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevIO.API.V2.Controllers
