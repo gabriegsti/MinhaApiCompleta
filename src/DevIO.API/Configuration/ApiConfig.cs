@@ -42,8 +42,8 @@ namespace DevIO.API.Configuration
                         builder
                         .AllowAnyMethod()
                         .AllowAnyOrigin()
-                        .AllowAnyHeader()
-                        .SetIsOriginAllowed(hostName => true);
+                        .AllowAnyHeader();
+                       
                     });
 
                 //options.AddDefaultPolicy(
@@ -80,8 +80,6 @@ namespace DevIO.API.Configuration
                 //Sets Development option for cors
                 app.UseCors("Development");
                 app.UseDeveloperExceptionPage();
-
-                app.UseHsts();
             }
             else
             {
