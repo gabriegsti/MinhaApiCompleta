@@ -12,6 +12,10 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
     .AddEnvironmentVariables();
 
+if(builder.Environment.EnvironmentName == "Production")
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
 
 builder.Services.AddDbContext<MeuDbContext>(options =>
 {

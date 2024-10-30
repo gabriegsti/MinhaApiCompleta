@@ -113,7 +113,7 @@ namespace DevIO.API.Configuration
                 {
                     //Where UI api will be server by the browser
                     options.UIPath = "/api/hc-ui";
-                    options.ResourcesPath = "/api/hc-ui-resources";
+                    options.ApiPath = "/api/hc-ui-resources";
 
                     options.UseRelativeApiPath = false;
                     options.UseRelativeResourcesPath = false;
