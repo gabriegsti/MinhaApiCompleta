@@ -18,7 +18,7 @@ namespace DevIO.API.V2.Controllers
         public string Valor()
         {
 
-            throw new Exception("Error");
+            _logger.LogInformation("Valor");
 
 
             //try
