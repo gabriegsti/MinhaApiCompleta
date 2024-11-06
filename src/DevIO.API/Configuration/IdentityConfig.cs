@@ -14,7 +14,7 @@ namespace DevIO.API.Configuration
         {
             //Identity Configuration
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>()
                     .AddRoles<IdentityRole>()

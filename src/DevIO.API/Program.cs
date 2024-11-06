@@ -19,7 +19,7 @@ if(builder.Environment.EnvironmentName == "Production")
 
 builder.Services.AddDbContext<MeuDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 builder.Services.AddIdentityConfiguration(builder.Configuration);
